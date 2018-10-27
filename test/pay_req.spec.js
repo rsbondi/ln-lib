@@ -2,8 +2,6 @@ const PaymentRequest = require('../src/invoice')
 const testdata = require('./testdata')
 const assert = require('assert');
 
-const req = "lnsb20300n1pdarmakpp57zzavxfm39rzg9juc6awru0zfgxvdaewkdupkmmw0x787ds0k04sdqcvdex2ct5v4jzq6twyp3k7er9cqzys7d9uyytydxmsqdz6h9s9wlu2276hjsysa3upu0mz0k55el5323634yjasmnep6hkmyh93ke6nj0v9p3rzgyl5wwu2cfplyg5wv9wdycqaaejt7"
-
 describe('Test payment lib', function () {
     it('should initialize with proper bech32 prefix', function () {
         testdata.requests.forEach(data => {
@@ -56,9 +54,9 @@ describe('Test payment lib', function () {
     it('should get payment hash from tagged field', function () {
         testdata.requests.forEach(data => {
             let pay = new PaymentRequest(data.request)
-            let testhash = data.tagged.map(t => t.type == 'payment_hash')[0]
-            let payhash = pay.tagged.map(t => t.type == 'payment_hash')[0]
-            assert.strictEqual(testhash, payhash)
+            let testhash = data.tagged.filter(t => t.type == 'payment_hash')[0]
+            let payhash = pay.tagged.filter(t => t.type == 'payment_hash')[0]
+            assert.strictEqual(testhash.data, payhash.data)
 
         })
     })
@@ -66,9 +64,23 @@ describe('Test payment lib', function () {
     it('should get description from tagged field', function () {
         testdata.requests.forEach(data => {
             let pay = new PaymentRequest(data.request)
-            let testdesc = data.tagged.map(t => t.type == 'description')[0]
-            let paydesc = pay.tagged.map(t => t.type == 'description')[0]
-            assert.strictEqual(testdesc, paydesc)
+            let testdesc = data.tagged.filter(t => t.type == 'description')
+            if(testdesc.length && testdesc[0].data) {  // am I handling empty ok here?
+                let paydesc = pay.tagged.filter(t => t.type == 'description')
+                assert.strictEqual(testdesc[0].data, paydesc[0].data)
+            }
+
+        })
+    })
+
+    it('properly calculates expiry', function () {
+        testdata.requests.forEach(data => {
+            let pay = new PaymentRequest(data.request)
+            let testexpiry = data.tagged.filter(t => t.type == 'expiry')
+            if(testexpiry.length) {
+                let payexpiry = pay.tagged.filter(t => t.type == 'expiry')
+                assert.strictEqual(testexpiry[0].data, payexpiry[0].data)
+            }
 
         })
     })

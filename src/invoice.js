@@ -18,12 +18,24 @@ const amounts = {
   'p': new big(0.000000000001)
 }
 
+function processHex(data, enc) {return Buffer.from(PaymentRequest._convert(data, 5, 8, false)).toString(enc)}
+
+function processInt(data) {
+  let val = 0
+  for (let i = 0; i < data.length; i++) {
+    let word = data[i]
+    val += word * Math.pow(32, data.length - i - 1)
+  }
+  return val
+
+}
+
 const decodeTypes = {
-  1: {label: 'payment_hash',          process(data) { return Buffer.from(PaymentRequest._convert(data, 5, 8, false)).toString('hex') } },
- 13: {label: 'description',           process(data) { return Buffer.from(PaymentRequest._convert(data, 5, 8, false)).toString('utf8') } },
- 19: {label: 'payee_pubkey',          process(data) { return "" }},
- 23: {label: 'purpose_hash',          process(data) { return "" }},
-  6: {label: 'expiry',                process(data) { return "" }},
+  1: {label: 'payment_hash',          process(data) { return processHex(data, 'hex') } },
+ 13: {label: 'description',           process(data) { return processHex(data, 'utf8') } },
+ 19: {label: 'payee_pubkey',          process(data) { return processHex(data, 'hex') }},
+ 23: {label: 'purpose_hash',          process(data) { return processHex(data, 'hex') }},
+  6: {label: 'expiry',                process(data) { return processInt(data) }},
  24: {label: 'min_final_cltv_expiry', process(data) { return "" }},
   9: {label: 'witness',               process(data) { return "" }},
   3: {
