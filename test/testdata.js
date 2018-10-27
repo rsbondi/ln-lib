@@ -48,6 +48,32 @@ module.exports = {
             signature: "ef48227e1fc758f80e38f2a3edbb3da5b5e65bcb8cb416ed93e73ad311ed84a82efd1ade46644db8f5678f523f9f086f2d50967090982753c65e433ef4fcc20301"
         },
         {
+            request: "lnbc1380n1pdcc6z6pp5fu7qgkud3t6shtd49peznfxcme7f8evnnk3gzycpnl4fa0ryffhsdp2g3hkuct5d9hkugr5dusyu6trdakxzueqg3hhy6t9wgxqrpc8cqp2sh2w9xuyttya829nauh96cutmkzmrjw2m6rsf4n4tx86u4zt7nd3c6tew67ff8vn5rmr3nyxscndcwutx47adly0jymev0w764kw2aqphuszdt",
+            "prefix": "lnbc",
+            "timestamp": 1535928410,
+            "amount": 0.00000138,
+            "tagged": [
+              {
+                "type": "payment_hash",
+                "data": "4f3c045b8d8af50badb5287229a4d8de7c93e5939da28113019fea9ebc644a6f"
+              },
+              {
+                "type": "description",
+                "data": "Donation to Nicolas Dorier"
+              },
+              {
+                "type": "expiry",
+                "data": 1799
+              },
+              {
+                "type": "min_final_cltv_expiry",
+                "data": 10
+              }
+            ],
+            pubKey: "02634b5d6b7db0cf26025bb59ddf1eafed2f1857de3550c129cfd7dbfb403c4e0f",
+            "signature": "85d4e29b845ac9d3a8b3ef2e5d638bdd85b1c9cade8704d675598fae544bf4db1c697976bc949d93a0f638cc868626dc3b8b357dd6fc8f9137963dded56ce57401"
+        },    
+        {
             request: "lnbc1pvjluezpp5qqqsyqcyq5rqwzqfqqqsyqcyq5rqwzqfqqqsyqcyq5rqwzqfqypqdpl2pkx2ctnv5sxxmmwwd5kgetjypeh2ursdae8g6twvus8g6rfwvs8qun0dfjkxaq8rkx3yf5tcsyz3d73gafnh3cax9rn449d9p5uxz9ezhhypd0elx87sjle52x86fux2ypatgddc6k63n7erqz25le42c4u4ecky03ylcqca784w",
             prefix: "lnbc",
             timestamp: 1496314658,

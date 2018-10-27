@@ -4,10 +4,18 @@ WIP
 
 currently can partially parse a payment request
 
-* ✔ payment_hash
-* ✔ description
-* payee_pubkey
-* purpose_hash
-* expiry
-* min_final_cltv_expiry
-* witness
+* general
+    * ✔ request
+    * ✔ prefix
+    * ✔ amount
+    * ✔ timestamp
+    * ✔ tagged
+* tagged fields
+    * ✔ payment_hash
+    * ✔ description
+    * payee_pubkey
+    * purpose_hash
+    * expiry
+    * min_final_cltv_expiry
+    * witness
+    * routing
