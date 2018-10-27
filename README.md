@@ -13,9 +13,9 @@ currently can partially parse a payment request
 * tagged fields
     * ✔ payment_hash
     * ✔ description
-    * payee_pubkey
-    * purpose_hash
-    * expiry
-    * min_final_cltv_expiry
+    * ✔ payee_pubkey
+    * ✔ purpose_hash
+    * ✔ expiry
+    * ✔ min_final_cltv_expiry
     * witness
     * routing

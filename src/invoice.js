@@ -36,8 +36,8 @@ const decodeTypes = {
  19: {label: 'payee_pubkey',          process(data) { return processHex(data, 'hex') }},
  23: {label: 'purpose_hash',          process(data) { return processHex(data, 'hex') }},
   6: {label: 'expiry',                process(data) { return processInt(data) }},
- 24: {label: 'min_final_cltv_expiry', process(data) { return "" }},
-  9: {label: 'witness',               process(data) { return "" }},
+ 24: {label: 'min_final_cltv_expiry', process(data) { return processInt(data) }},
+  9: {label: 'witness',               process(data) { return processHex(data, 'hex') } }, // or fallback address TODO: verify correctness
   3: {
          label: 'routing',
          process(data) { 
@@ -155,10 +155,7 @@ class PaymentRequest {
       if (bits > 0) {
         result.push((value << (outBits - bits)) & maxV)
       }
-    } else {
-      if (bits >= inBits) throw new Error('Excess padding')
-      if ((value << (outBits - bits)) & maxV) throw new Error('Non-zero padding')
-    }
+    } 
 
     return result
   }

@@ -85,4 +85,52 @@ describe('Test payment lib', function () {
         })
     })
 
+    it('properly calculates payee_pubkey', function () { // TODO: no test data
+        testdata.requests.forEach(data => {
+            let pay = new PaymentRequest(data.request)
+            let testpub= data.tagged.filter(t => t.type == 'payee_pubkey')
+            if(testpub.length) {
+                let paypub = pay.tagged.filter(t => t.type == 'payee_pubkey')
+                assert.strictEqual(testpub[0].data, paypub[0].data)
+            }
+
+        })
+    })
+
+    it('properly calculates purpose_hash', function () {
+        testdata.requests.forEach(data => {
+            let pay = new PaymentRequest(data.request)
+            let testpurp = data.tagged.filter(t => t.type == 'purpose_hash')
+            if(testpurp.length) {
+                let paypurp = pay.tagged.filter(t => t.type == 'purpose_hash')
+                assert.strictEqual(testpurp[0].data, paypurp[0].data)
+            }
+
+        })
+    })
+
+    it('properly calculates min_final_cltv_expiry', function () {
+        testdata.requests.forEach(data => {
+            let pay = new PaymentRequest(data.request)
+            let testmin = data.tagged.filter(t => t.type == 'min_final_cltv_expiry')
+            if(testmin.length) {
+                let paymin = pay.tagged.filter(t => t.type == 'min_final_cltv_expiry')
+                assert.strictEqual(testmin[0].data, paymin[0].data)
+            }
+
+        })
+    })
+
+    it('properly processes witness', function () {
+        testdata.requests.forEach(data => {
+            let pay = new PaymentRequest(data.request)
+            let testwit = data.tagged.filter(t => t.type == 'witness')
+            if(testwit.length) {
+                let paywit = pay.tagged.filter(t => t.type == 'witness')
+                assert.strictEqual(testwit[0].data, paywit[0].data)
+            }
+
+        })
+    })
+
 })
