@@ -30,6 +30,46 @@ function processInt(data) {
 
 }
 
+// TODO: use reader  in PaymentRequest
+class Reader {
+  constructor(words) {
+    this.index = 0
+    this.words = words
+  }
+  read(n) {
+    let response = []
+    let val
+    for (let i = 0; i < n; i++) {
+      if(!(i%8)) val = 0
+      let wordIndex = Math.floor(this.index / 5)
+      let bitIndex = 4 - this.index % 5
+      let word = this.words[wordIndex]
+      let pow = (1 << (7 - i%8)) * (word >> bitIndex & 1)
+      val += pow
+      if(i%8==7) response.push(val)
+      this.index++
+    }
+    return response
+  }
+
+  readInt(n) {
+    let val = 0
+    for (let i = 0; i < n; i++) {
+      let wordIndex = Math.floor(this.index / 5)
+      let bitIndex = 4 - this.index % 5
+      let word = this.words[wordIndex]
+      let pow = (1 << (n - i - 1)) * (word >> bitIndex & 1)
+      val += pow
+      this.index++
+    }
+    return val
+  }
+
+  remaining() {
+    return 5 * this.words.length - this.index
+  }
+}
+
 const decodeTypes = {
   1: {label: 'payment_hash',          process(data) { return processHex(data, 'hex') } },
  13: {label: 'description',           process(data) { return processHex(data, 'utf8') } },
@@ -41,20 +81,18 @@ const decodeTypes = {
   3: {
          label: 'routing',
          process(data) { 
-           return ""
-             const reader = Bit.Reader(data)
+             const reader = new Reader(data)
              let routing = []
              while(reader.remaining() >= 408) // why again trailing 4 bits???
                  routing.push({
-                     pubkey                     : binStr2hex(reader.read(264)),
-                     short_channel_id           : binStr2hex(reader.read(64)),
+                     pubkey                     : Buffer.from(reader.read(264)).toString('hex'),
+                     short_channel_id           : Buffer.from(reader.read(64)).toString('hex'),
                      fee_base_msat              : reader.readInt(32),
                      fee_proportional_millionths: reader.readInt(32),
                      cltv_expiry_delta          : reader.readInt(16)
                  })
-             
              return routing
-         }
+        }
      },
 }
 class PaymentRequest {

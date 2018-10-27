@@ -133,4 +133,20 @@ describe('Test payment lib', function () {
         })
     })
 
+    it('properly processes routing info', function () {
+        testdata.requests.forEach(data => {
+            let pay = new PaymentRequest(data.request)
+            let testroute = data.tagged.filter(t => t.type == 'routing')
+            if(testroute.length) {
+                let payroute = pay.tagged.filter(t => t.type == 'routing')
+                payroute[0].data.forEach((r, i) => {
+                    Object.keys(r).forEach(k => {
+                        assert.strictEqual(r[k], testroute[0].data[i][k])
+                    })
+                })
+            }
+
+        })
+    })
+
 })

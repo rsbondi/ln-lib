@@ -17,5 +17,5 @@ currently can partially parse a payment request
     * ✔ purpose_hash
     * ✔ expiry
     * ✔ min_final_cltv_expiry
-    * witness
-    * routing
+    * ❓ witness
+    * ✔ routing
