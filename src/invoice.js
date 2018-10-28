@@ -4,7 +4,7 @@ const crypto = require('crypto')
 const big = require('bignumber.js')
 const {prefixes, amounts} = require('./constants')
 const {decodeTypes} = require('./util')
-const Reader = require('./reader')
+const WordReader = require('./reader')
 
 class PaymentRequest {
   constructor(req) {
@@ -12,7 +12,7 @@ class PaymentRequest {
     if (req) {
       this.invoice = req
       this.bech32 = bech32.decode(req, 9999)
-      this.reader = new Reader(this.bech32.words)
+      this.reader = new WordReader(this.bech32.words)
       this.prefix = prefixes.reduce((o, c, i) => {
         if (!o && this.bech32.prefix.match(c)) o = c
         return o
@@ -47,7 +47,7 @@ class PaymentRequest {
 
   requesterPubKey() {
     const words = this.bech32.words.slice(0, -104)
-    const rdr = new Reader(words)
+    const rdr = new WordReader(words)
     const data_part_less_sig = rdr.read(words.length*5, true)
     const msg = Buffer.concat([Buffer.from(this.bech32.prefix, 'utf8'), Buffer.from(data_part_less_sig)]) // prefix concat data all in bytes
     const sighash = crypto.createHash('sha256').update(msg).digest()

@@ -1,5 +1,5 @@
 // TODO: use reader  in PaymentRequest
-class Reader {
+class WordReader {
     constructor(words) {
       this.index = 0
       this.words = words
@@ -21,8 +21,7 @@ class Reader {
         const bits = n % 8
         if (bits > 0) {
           response.push((this.words.slice(-1) << (8 - bits)) & 255)
-        }
-  
+        }  
       }
       return response
     }
@@ -52,4 +51,4 @@ class Reader {
     }
   }
   
-  module.exports = Reader
+  module.exports = WordReader

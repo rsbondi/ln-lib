@@ -1,4 +1,4 @@
-const Reader = require('./reader')
+const WordReader = require('./reader')
 
 function processHex(data, enc) {return Buffer.from(convertWords(data, 5, 8)).toString(enc)}
 
@@ -9,7 +9,6 @@ function processInt(data) {
     val += word * Math.pow(32, data.length - i - 1)
   }
   return val
-
 }
 
 const decodeTypes = {
@@ -23,7 +22,7 @@ const decodeTypes = {
   3: {
          label: 'routing',
          process(data) { 
-             const reader = new Reader(data)
+             const reader = new WordReader(data)
              let routing = []
              while(reader.remaining() >= 404) 
                  routing.push({
