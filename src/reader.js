@@ -32,6 +32,13 @@ class Reader {
       }
       return val
     }
+
+    readWords(n) {
+      let wordIndex = this.index / 5
+      this.index += n*5
+      return this.words.slice(wordIndex, wordIndex+n)
+    }
+  
   
     remaining() {
       return 5 * this.words.length - this.index

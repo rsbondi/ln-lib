@@ -25,7 +25,7 @@ const decodeTypes = {
          process(data) { 
              const reader = new Reader(data)
              let routing = []
-             while(reader.remaining() >= 408) // why again trailing 4 bits???
+             while(reader.remaining() >= 404) 
                  routing.push({
                      pubkey                     : Buffer.from(reader.read(264)).toString('hex'),
                      short_channel_id           : Buffer.from(reader.read(64)).toString('hex'),
