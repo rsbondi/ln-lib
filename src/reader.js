@@ -4,7 +4,7 @@ class Reader {
       this.index = 0
       this.words = words
     }
-    read(n) {
+    read(n, pad) {
       let response = []
       let val
       for (let i = 0; i < n; i++) {
@@ -16,6 +16,13 @@ class Reader {
         val += pow
         if(i%8==7) response.push(val)
         this.index++
+      }
+      if(pad) {
+        const bits = n % 8
+        if (bits > 0) {
+          response.push((this.words.slice(-1) << (8 - bits)) & 255)
+        }
+  
       }
       return response
     }

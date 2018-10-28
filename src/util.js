@@ -1,6 +1,6 @@
 const Reader = require('./reader')
 
-function processHex(data, enc) {return Buffer.from(convertWords(data, 5, 8, false)).toString(enc)}
+function processHex(data, enc) {return Buffer.from(convertWords(data, 5, 8)).toString(enc)}
 
 function processInt(data) {
   let val = 0
@@ -38,8 +38,10 @@ const decodeTypes = {
      },
 }
 
-  // from bech32 lib, not exposed
-  function convertWords(data, inBits, outBits, pad) {
+  // from bech32 lib, not exposed, bech32.fromWords throws excess padding but works here
+  // this is outside of bech32 spec at this point so different use case ok
+  // only used here internally
+  function convertWords(data, inBits, outBits) {
     var value = 0
     var bits = 0
     var maxV = (1 << outBits) - 1
@@ -54,17 +56,9 @@ const decodeTypes = {
         result.push((value >> bits) & maxV)
       }
     }
-
-    if (pad) {
-      if (bits > 0) {
-        result.push((value << (outBits - bits)) & maxV)
-      }
-    } 
-
     return result
 }
 
 module.exports = {
-    decodeTypes: decodeTypes,
-    convertWords: convertWords
+    decodeTypes: decodeTypes
 }
