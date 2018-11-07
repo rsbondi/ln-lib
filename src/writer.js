@@ -10,6 +10,12 @@ class WordWriter {
     }
 
     writeInt(val, n) {
+        if(!n) {
+            let p = 0
+            while(val > 1<<p) p++
+            n = 5*Math.ceil((p+1)/5)
+            this.writeInt(n/5, 10)
+        }
         let bytes = []      
         let v = 0
         for (let i = 0; i < n; i++) {

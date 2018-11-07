@@ -11,19 +11,20 @@ function processInt(data) {
   return val
 }
 
-function encodeHex(code, writer, data, enc) { writer.write(Buffer.from(data, enc)) }
+function encodeHex(code, writer, data, enc) { 
+  writer.writeInt(code, 5)
+  writer.writeInt(Math.ceil(data.length * 8 / 5), 10)
+  writer.write(Buffer.from(data, enc)) 
+}
 
 const encodeTypes = {
-  payment_hash: {process(writer, data) { 
-    writer.writeInt(1,5)
-    writer.writeInt(52, 10)
-    return encodeHex(1, writer, data, 'hex')}
-  },
-  description: {process(writer, data) { 
-    writer.writeInt(13, 5)
-    writer.writeInt(Math.ceil(data.length * 8 / 5), 10)
-    return encodeHex(1, writer, data, 'utf8')}
-  }
+  payment_hash:          { process(writer, data) { encodeHex(1, writer, data, 'hex')} },
+  description:           { process(writer, data) { encodeHex(13, writer, data, 'utf8')} },
+  payee_pubkey:          { process(writer, data) { encodeHex(19, writer, data, 'hex')} },
+  purpose_hash:          { process(writer, data) { encodeHex(23, writer, data, 'hex')} },
+  expiry:                { process(writer, data) { writer.writeInt(6, 5); writer.writeInt(data) } },
+  min_final_cltv_expiry: { process(writer, data) { writer.writeInt(24, 5); writer.writeInt(data) } },
+  witness:               { process(writer, data) { encodeHex(9, writer, data, 'hex')} },
 }
 
 const decodeTypes = {
