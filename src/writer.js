@@ -5,8 +5,8 @@ class WordWriter {
       this.words = []
     }
 
-    write(val) {
-
+    write(bytes) {
+        this.words = this.words.concat(bech32.toWords(bytes))
     }
 
     writeInt(val, n) {

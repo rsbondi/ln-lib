@@ -11,6 +11,21 @@ function processInt(data) {
   return val
 }
 
+function encodeHex(code, writer, data, enc) { writer.write(Buffer.from(data, enc)) }
+
+const encodeTypes = {
+  payment_hash: {process(writer, data) { 
+    writer.writeInt(1,5)
+    writer.writeInt(52, 10)
+    return encodeHex(1, writer, data, 'hex')}
+  },
+  description: {process(writer, data) { 
+    writer.writeInt(13, 5)
+    writer.writeInt(Math.ceil(data.length * 8 / 5), 10)
+    return encodeHex(1, writer, data, 'utf8')}
+  }
+}
+
 const decodeTypes = {
   1: {label: 'payment_hash',          process(data) { return processHex(data, 'hex') } },
  13: {label: 'description',           process(data) { return processHex(data, 'utf8') } },
@@ -59,5 +74,6 @@ const decodeTypes = {
 }
 
 module.exports = {
-    decodeTypes: decodeTypes
+    decodeTypes: decodeTypes,
+    encodeTypes: encodeTypes
 }
