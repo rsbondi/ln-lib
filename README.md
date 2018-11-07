@@ -2,7 +2,7 @@
 
 WIP
 
-currently can partially parse a payment request
+parse a payment request
 
 * general
     * ✔ request
@@ -17,5 +17,22 @@ currently can partially parse a payment request
     * ✔ purpose_hash
     * ✔ expiry
     * ✔ min_final_cltv_expiry
-    * ❓ witness
+    * ❓ witness - this is parsing but unsure of terminology
     * ✔ routing
+
+encoding
+
+* general
+    * prefix
+    * amount
+    * ✔ timestamp
+    * tagged
+* tagged fields
+    * ✔ payment_hash
+    * ✔ description
+    * ✔ payee_pubkey
+    * ✔ purpose_hash
+    * ✔ expiry
+    * ✔ min_final_cltv_expiry
+    * ❓ witness
+    * routing
