@@ -5,6 +5,7 @@ const big = require('bignumber.js')
 const {prefixes, amounts} = require('./constants')
 const {decodeTypes} = require('./util')
 const WordReader = require('./reader')
+const WordWriter = require('./writer')
 
 class PaymentRequest {
   constructor(req) {
@@ -43,6 +44,13 @@ class PaymentRequest {
       const signature = this.reader.read(104*5)
       this.signature = Buffer.from(signature)
     }
+  }
+
+  encode(obj) {
+    this.writer = new WordWriter()
+    this.prefix = obj.prefix
+    this.writer.writeInt(obj.timestamp, 35)
+    // console.log(bech32.encode(this.prefix, this.writer.words).slice(0, -6))
   }
 
   requesterPubKey() {

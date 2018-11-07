@@ -1,4 +1,3 @@
-// TODO: use reader  in PaymentRequest
 class WordReader {
     constructor(words) {
       this.index = 0
@@ -6,15 +5,17 @@ class WordReader {
     }
     read(n, pad) {
       let response = []
-      let val
+      let val = 0
       for (let i = 0; i < n; i++) {
-        if(!(i%8)) val = 0
         let wordIndex = Math.floor(this.index / 5)
         let bitIndex = 4 - this.index % 5
         let word = this.words[wordIndex]
         let pow = (1 << (7 - i%8)) * (word >> bitIndex & 1)
         val += pow
-        if(i%8==7) response.push(val)
+        if(i%8==7) {
+          response.push(val)
+          val = 0
+        }
         this.index++
       }
       if(pad) {

@@ -2,7 +2,7 @@ const PaymentRequest = require('../src/invoice')
 const testdata = require('./testdata')
 const assert = require('assert');
 
-describe('Test payment lib', function () {
+describe('Test payment lib decoding', function () {
     it('should initialize with proper bech32 prefix', function () {
         testdata.requests.forEach(data => {
             let pay = new PaymentRequest(data.request)
@@ -150,3 +150,14 @@ describe('Test payment lib', function () {
     })
 
 })
+
+describe('Test payment lib encoding', function () {
+    it('should initialize with proper bech32 prefix', function () {
+        testdata.requests.forEach(data => {
+            let pay = new PaymentRequest()
+            pay.encode(data)
+            assert.strictEqual(pay.prefix, data.prefix)
+        })
+    })
+})
+
