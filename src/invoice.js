@@ -58,17 +58,18 @@ class PaymentRequest {
     this.prefix = obj.prefix
     
     const keys = Object.keys(amounts)
-    let unit
-    keys.some(k => {
-      const amt = amounts[k]
-      const bigamt = new big(obj.amount)
-      if(amt.lt(bigamt) && (bigamt.dividedBy(amt).isInteger())) {
-        unit = k
-        return true
-      }
-    })
+    let unit = ''
+    if(obj.amount)
+      keys.some(k => {
+        const amt = amounts[k]
+        const bigamt = new big(obj.amount)
+        if(amt.lt(bigamt) && (bigamt.dividedBy(amt).isInteger())) {
+          unit = k
+          return true
+        }
+      })
 
-    this.bechprefix = this.prefix + new big(obj.amount).dividedBy(amounts[unit]).toString() + unit
+    this.bechprefix = this.prefix + (obj.amount ? new big(obj.amount).dividedBy(amounts[unit]).toString() + unit : '')
 
     this.writer.writeInt(obj.timestamp, 35)
 
