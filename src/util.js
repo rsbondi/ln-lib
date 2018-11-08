@@ -13,7 +13,7 @@ function processInt(data) {
 
 function encodeHex(code, writer, data, enc) { 
   writer.writeInt(code, 5)
-  writer.writeInt(Math.ceil(data.length * 8 / 5), 10)
+  writer.writeInt(Math.ceil(data.length/2 * 8 / 5), 10)
   writer.write(Buffer.from(data, enc)) 
 }
 
@@ -24,7 +24,21 @@ const encodeTypes = {
   purpose_hash:          { process(writer, data) { encodeHex(23, writer, data, 'hex')} },
   expiry:                { process(writer, data) { writer.writeInt(6, 5); writer.writeInt(data) } },
   min_final_cltv_expiry: { process(writer, data) { writer.writeInt(24, 5); writer.writeInt(data) } },
-  witness:               { process(writer, data) { encodeHex(9, writer, data, 'hex')} },
+  witness:               { process(writer, data) { encodeHex(9, writer, data, 'hex')} }, // TODO: sync up with version character
+  routing: {
+    process(writer, data) {
+      writer.writeInt(3, 5)
+      writer.writeInt(data.length*82, 10)
+      
+      data.forEach(d => {
+        writer.writeBytes(Buffer.from(d.pubkey, 'hex'))
+        writer.writeBytes(Buffer.from(d.short_channel_id, 'hex'))
+        writer.writeInt(d.fee_base_msat, 32)
+        writer.writeInt(d.fee_proportional_millionths, 32)
+        writer.writeInt(d.cltv_expiry_delta, 16)    
+      })
+    }
+  }
 }
 
 const decodeTypes = {

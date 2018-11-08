@@ -8,8 +8,11 @@ const WordReader = require('./reader')
 const WordWriter = require('./writer')
 
 class PaymentRequest {
+  /**
+   * create instance and parse if request provided
+   * @param {string} [req] bech32 encoded payment request
+   */
   constructor(req) {
-    // if request provided, start decoding, otherwise call "encode" later
     if (req) {
       this.invoice = req
       this.bech32 = bech32.decode(req, 9999)
@@ -46,17 +49,38 @@ class PaymentRequest {
     }
   }
 
+  /**
+   * encode a payment object to bech32 lightning payment_request
+   * @param {object} obj a decoded payment request object
+   */
   encode(obj) {
     this.writer = new WordWriter()
     this.prefix = obj.prefix
+    
+    const keys = Object.keys(amounts)
+    let unit
+    keys.some(k => {
+      const amt = amounts[k]
+      const bigamt = new big(obj.amount)
+      if(amt.lt(bigamt) && (bigamt.dividedBy(amt).isInteger())) {
+        unit = k
+        return true
+      }
+    })
+
+    this.bechprefix = this.prefix + new big(obj.amount).dividedBy(amounts[unit]).toString() + unit
+
     this.writer.writeInt(obj.timestamp, 35)
 
     obj.tagged.forEach(t => {
       if(encodeTypes[t.type]) encodeTypes[t.type].process(this.writer, t.data)
     })
-    console.log(bech32.encode(this.prefix, this.writer.words, 9999).slice(0, -6))
+    console.log(bech32.encode(this.bechprefix, this.writer.words, 9999).slice(0, -6))
   }
 
+  /**
+   * recover puglic key from signature
+   */
   requesterPubKey() {
     const words = this.bech32.words.slice(0, -104)
     const rdr = new WordReader(words)
