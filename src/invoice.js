@@ -14,7 +14,7 @@ class PaymentRequest {
    */
   constructor(req) {
     if (req) {
-      this.invoice = req
+      this.payment_request = req
       this.bech32 = bech32.decode(req, 9999)
       this.reader = new WordReader(this.bech32.words)
       this.prefix = prefixes.reduce((o, c, i) => {
@@ -76,7 +76,8 @@ class PaymentRequest {
     obj.tagged.forEach(t => {
       if(encodeTypes[t.type]) encodeTypes[t.type].process(this.writer, t.data)
     })
-    console.log(bech32.encode(this.bechprefix, this.writer.words, 9999).slice(0, -6))
+    this.writer.write(Buffer.from(obj.signature, 'hex'))
+    this.request = bech32.encode(this.bechprefix, this.writer.words, 9999)
   }
 
   /**

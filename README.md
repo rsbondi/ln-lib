@@ -18,6 +18,7 @@ parse a payment request
         * ✔ min_final_cltv_expiry
         * ❓ witness - this is parsing but unsure of terminology
         * ✔ routing
+    * ✔ signature
 
 encoding
 
@@ -34,3 +35,4 @@ encoding
         * ✔ min_final_cltv_expiry
         * witness - something up with version?
         * routing
+    * ✔ signature
