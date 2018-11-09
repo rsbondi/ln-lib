@@ -165,8 +165,8 @@ module.exports = {
                     "data": "0001020304050607080900010203040506070809000102030405060708090102"
                 },
                 {
-                    "type": "witness",
-                    "data": "898b95ab2a7b341e47d8a34ace9a3e7181e57265"
+                    "type": "fallback_address",
+                    "data": "173172b5654f6683c8fb146959d347ce303cae4ca7"
                 }
             ],
             "signature": "b6c42b8a61e0dc5823ea63e76ff148ab5f6c86f45f9722af0069c7934daff70d5e315893300774c897995e3a7476c8193693d144a36e2645a0851e6ebafc9d0a01"
@@ -186,8 +186,8 @@ module.exports = {
                     "data": "3925b6f67e2c340036ed12093dd44e0368df1b6ea26c53dbe4811f58fd5db8c1"
                 },
                 {
-                    "type": "witness",
-                    "data": "8825b0fbee0f506e4ca122326620326e2b26c8f4"
+                    "type": "fallback_address",
+                    "data": "1704b61f7dc1ea0dc99424464cc4064dc564d91e89"
                 },
                 {
                     "type": "routing",
@@ -226,8 +226,8 @@ module.exports = {
                 "data": "0001020304050607080900010203040506070809000102030405060708090102"
               },
               {
-                "type": "witness",
-                "data": "947aaab1dcd0cf990e108f4dcf9c66fb437503c2"
+                "type": "fallback_address",
+                "data": "188f55563b9a19f321c211e9b9f38cdf686ea07845"
               }
             ],
             "signature": "b6c6860fc6ff41bafba1745b538b6a7c6c2c0234f76bf817bf567be88cf2c632492c9dd279470841cd1e21a33ae7ed59b25809bf9b3366fe81881651589f5d1500"
@@ -247,8 +247,8 @@ module.exports = {
                 "data": "0001020304050607080900010203040506070809000102030405060708090102"
               },
               {
-                "type": "witness",
-                "data": "03a8f3b740cc8cb6a2a4a0e22e8d9d191f8a19de"
+                "type": "fallback_address",
+                "data": "00751e76e8199196d454941c45d1b3a323f1433bd6"
               }
             ],
             "signature": "c8583b8f65853d7cc90f0eb4ae0e92a606f89caf4f7d65048142d7bbd4e5f3623ef407a75458e4b20f00efbc734f1c2eefc419f3a2be6d51038016ffb35cd61300"
@@ -268,8 +268,8 @@ module.exports = {
                 "data": "0001020304050607080900010203040506070809000102030405060708090102"
               },
               {
-                "type": "witness",
-                "data": "00c318a1e0a628b34025e8c9019ab6d09b64c2b3c66a693d0dc63194b024819310"
+                "type": "fallback_address",
+                "data": "001863143c14c5166804bd19203356da136c985678cd4d27a1b8c6329604903262"
               }
             ],
             "signature": "51e4f6446e410a164a6da9f39507e730c26241b4456ab6ea28d1b12c71ef8ca20c9cfe3dffc07d9f8db671ecaa4d20beedb193bda8ce37c59f85f82773a55d4700"

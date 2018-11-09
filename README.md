@@ -16,7 +16,7 @@ parse a payment request
         * ✔ purpose_hash
         * ✔ expiry
         * ✔ min_final_cltv_expiry
-        * ❓ witness - this is parsing but unsure of terminology
+        * ✔ fallback_address - need to verify test data
         * ✔ routing
     * ✔ signature
 
@@ -33,6 +33,6 @@ encoding
         * ✔ purpose_hash
         * ✔ expiry
         * ✔ min_final_cltv_expiry
-        * witness - something up with version?
+        * ✔ fallback_address
         * routing
     * ✔ signature

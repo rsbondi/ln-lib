@@ -38,7 +38,12 @@ const encodeTypes = {
   purpose_hash:          { process(writer, data) { encodeHex(23, writer, data, 'hex')} },
   expiry:                { process(writer, data) { writer.writeInt(6, 5); writer.writeInt(data) } },
   min_final_cltv_expiry: { process(writer, data) { writer.writeInt(24, 5); writer.writeInt(data) } },
-  witness:               { process(writer, data) { encodeHex(9, writer, data, 'hex')} }, // TODO: sync up with version character
+  fallback_address:      { process(writer, data) { 
+    writer.writeInt(9, 5)
+    writer.writeInt(Math.ceil((data.length-2)/2 * 8 / 5 +1), 10)
+    writer.writeInt(parseInt(data.slice(0,2), 10), 5) // version
+    writer.write(Buffer.from(data.slice(2), 'hex')) 
+    }}, 
   routing: {
     process(writer, data) {
       writer.writeInt(3, 5)
@@ -62,7 +67,11 @@ const decodeTypes = {
  23: {label: 'purpose_hash',          process(data) { return processHex(data, 'hex') }},
   6: {label: 'expiry',                process(data) { return processInt(data) }},
  24: {label: 'min_final_cltv_expiry', process(data) { return processInt(data) }},
-  9: {label: 'witness',               process(data) { return processHex(data, 'hex') } }, // or fallback address TODO: verify correctness
+  9: {label: 'fallback_address',      process(data) { 
+    let version = ''+processInt(data.slice(0,1))
+    if(version.length%2) version = '0' + version
+    return version+processHex(data.slice(1), 'hex') 
+  } }, 
   3: {
          label: 'routing',
          process(data) { 

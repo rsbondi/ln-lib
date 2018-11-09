@@ -121,12 +121,12 @@ describe('Test payment lib decoding', function () {
         })
     })
 
-    it('properly processes witness', function () {
+    it('properly processes fallback_address', function () {
         testdata.requests.forEach(data => {
             let pay = new PaymentRequest(data.request)
-            let testwit = data.tagged.filter(t => t.type == 'witness')
+            let testwit = data.tagged.filter(t => t.type == 'fallback_address')
             if(testwit.length) {
-                let paywit = pay.tagged.filter(t => t.type == 'witness')
+                let paywit = pay.tagged.filter(t => t.type == 'fallback_address')
                 assert.strictEqual(testwit[0].data, paywit[0].data)
             }
 
@@ -152,9 +152,9 @@ describe('Test payment lib decoding', function () {
 })
 
 describe('Test payment lib encoding', function () {
-    it('should initialize with proper bech32 prefix', function () {
+    it('should encode to proper bech32 payment request', function () {
         testdata.requests.forEach(data => {
-            if(data.tagged.filter(t => t.type == 'witness'||t.type == 'routing').length) return // fields are wip, ignore for now
+            if(data.tagged.filter(t => t.type == 'routing').length) return // fields are wip, ignore for now
             let pay = new PaymentRequest()
             pay.encode(data)
             assert.strictEqual(pay.request, data.request)
