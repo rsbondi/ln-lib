@@ -2,7 +2,9 @@
 
 WIP
 
-parse a payment request
+### BOLT 11
+
+##### parse a payment request
 
 * general
     * ✔ request
@@ -20,7 +22,7 @@ parse a payment request
         * ✔ routing
     * ✔ signature
 
-encoding
+#### encoding
 
 * general
     * ✔ prefix
@@ -36,3 +38,24 @@ encoding
         * ✔ fallback_address
         * routing
     * ✔ signature
+
+### BOLT 3
+
+#### funding
+
+* create transaction
+    * inputs
+    * outputs
+        * funding
+        * change
+    * amount
+    * ✔ script
+
+
+#### commitment
+
+* everything
+
+
+
+

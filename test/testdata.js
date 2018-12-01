@@ -351,6 +351,10 @@ module.exports = {
                 to_local_msat: 7000000000,
                 to_remote_msat: 3000000000,
                 local_feerate_per_kw: 15000,
+                to_local: {
+                    amount: 6989140,
+                    wscript: "63210212a140cd0c6539d07cd08dfe09984dec3251ea808b892efeac3ede9402bf2b1967029000b2752103fd5960528dc152014952efdb702a88f71e3c1653b2314431701ec77e57fde83c68ac"
+                },
                 // # base commitment transaction fee = 10860
                 // # actual commitment transaction fee = 10860
                 // # to_local amount 6989140 wscript 63210212a140cd0c6539d07cd08dfe09984dec3251ea808b892efeac3ede9402bf2b1967029000b2752103fd5960528dc152014952efdb702a88f71e3c1653b2314431701ec77e57fde83c68ac
