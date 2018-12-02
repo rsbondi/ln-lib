@@ -1,4 +1,5 @@
 const {opcodes} = require('./constants')
+const crypto = require('crypto')
 
 class Script {
     static createFundingScript(local_pubkey, remote_pubkey) {
@@ -13,6 +14,11 @@ class Script {
             .concat([opcodes.OP_2])
             .concat([opcodes.OP_CHECKMULTISIG])
         return Buffer.from(script)
+    }
+
+    static scriptPubKey(script) {
+        const scripthash = crypto.createHash('sha256').update(script).digest()
+        return Buffer.from([opcodes.OP_0].concat([scripthash.length]).concat(scripthash.toJSON().data))
     }
 
     static toLocalOutput(revocationPubkey, localDelayedPubkey, toSelfDelay) {
