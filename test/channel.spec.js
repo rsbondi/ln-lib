@@ -17,18 +17,6 @@ describe('Test funding transactions', function () {
         assert.strictEqual(witstr, funding.witness_script)
     })
 
-    it('properly creates to_local wscript', function () {
-        const revpk = common.local_revocation_pubkey
-        const delpk = common.local_delayedpubkey
-        const to_self_delay = common.local_delay
-        const witness = Script.toLocalOutput(revpk, delpk, to_self_delay)
-        const witstr = witness.toString('hex')
-        assert.strictEqual(witstr, testdata.commitment.txs[0].to_local.wscript)
-    })
-
-})
-
-describe('Test commitment transactions', function () {
     it('properly creates to_local scriptPubKey', function () {
         const local = testdata.funding.local_funding_pubkey
         const remote = testdata.funding.remote_funding_pubkey
@@ -36,6 +24,25 @@ describe('Test commitment transactions', function () {
         const intx = testdata.funding.input_tx
         const tx = chan.fund([{txid: intx.input_txid, n: intx.input_index}], intx.funding_satoshis, '')
         assert.strictEqual(tx.outputs[0].scriptPubKey.toString('hex'), "0020c015c4a6be010e21657068fc2e6a9d02b27ebe4d490a25846f7237f104d1a3cd")
+    })
+
+})    
+
+describe('Test commitment transactions', function () {
+    it('properly creates to_local wscript', function () {
+        const revpk = common.local_revocation_pubkey
+        const delpk = common.local_delayedpubkey
+        const to_self_delay = common.local_delay
+        const witness = Script.toLocalOutput(revpk, delpk, to_self_delay)
+        const witstr = witness.toString('hex')
+        assert.strictEqual(witstr, testdata.commitment.txs[0].to_local.wscript)
+        assert.strictEqual(Script.scriptPubKey(witness).toString('hex'), "00204adb4e2f00643db396dd120d4e7dc17625f5f2c11a40d857accc862d6b7dd80e")
+    })
+
+    it('properly creates to_remote wscript', function () {
+        const pk = common.remotepubkey
+        const script = Script.p2wpkh(pk)
+        assert.strictEqual(script.toString('hex'), "0014ccf1af2f2aabee14bb40fa3851ab2301de843110")
     })
 
     it('properly creates sequence', function () {
