@@ -2,6 +2,7 @@ const Channel = require('../src/channel')
 const Script = require('../src/script')
 const testdata = require('./testdata')
 const assert = require('assert');
+const crypto = require('crypto')
 
 const commit = testdata.commitment
 const common = commit.common
@@ -43,6 +44,15 @@ describe('Test commitment transactions', function () {
         const pk = common.remotepubkey
         const script = Script.p2wpkh(pk)
         assert.strictEqual(script.toString('hex'), "0014ccf1af2f2aabee14bb40fa3851ab2301de843110")
+    })
+
+    it('properly creates offered HTLC wscript', function () {
+        const pk = common.remotepubkey
+        const script = Script.offeredHTLCout(common.local_revocation_pubkey, 
+            common.localpubkey, 
+            common.remotepubkey,
+            crypto.createHash('sha256').update(Buffer.from(common.htlc_2_payment_preimage, 'hex')).digest())
+        assert.strictEqual(script.toString('hex'), "76a91414011f7254d96b819c76986c277d115efce6f7b58763ac67210394854aa6eab5b2a8122cc726e9dded053a2184d88256816826d6231c068d4a5b7c820120876475527c21030d417a46946384f88d5f3337267c5e579765875dc4daca813e21734b140639e752ae67a914b43e1b38138a41b37f7cd9a1d274bc63e3a9b5d188ac6868")
     })
 
     it('properly creates sequence', function () {
