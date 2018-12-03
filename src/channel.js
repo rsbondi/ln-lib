@@ -38,6 +38,13 @@ class Channel {
         return parseInt(sequenceBuff.toString('hex'), 16)
     }
 
+    commitmentLocktime(num) {
+        const obsucreCommitNum = parseInt(this.obscurator.slice(-3).toString('hex'), 16) ^ num
+        const commitBuff = Buffer.from(obsucreCommitNum.toString(16), 'hex')
+        const lockBuff = Buffer.concat([Buffer.from([0x20]), commitBuff])
+        return parseInt(lockBuff.toString('hex'), 16)
+    }
+
     commitmentObscurator(basepoint_open, basepoint_accept) {
         basepoint_open = typeof basepoint_open == 'string' ? Buffer.from(basepoint_open,'hex') : basepoint_open
         basepoint_accept = typeof basepoint_accept == 'string' ? Buffer.from(basepoint_accept,'hex') : basepoint_accept

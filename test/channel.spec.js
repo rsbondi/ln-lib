@@ -43,7 +43,16 @@ describe('Test commitment transactions', function () {
         const remote = testdata.funding.remote_funding_pubkey
         const chan = new Channel(local, remote)
         chan.setBasepoints(common.local_payment_basepoint, common.remote_payment_basepoint)
-        const sequence = chan.commitmentSequence(0)
+        const sequence = chan.commitmentSequence(0) // TODO: this works but does not match the docs, need to find out what's up
         assert.strictEqual(sequence, 2150346808)
+    })
+
+    it('properly creates locktime', function () {
+        const local = testdata.funding.local_funding_pubkey
+        const remote = testdata.funding.remote_funding_pubkey
+        const chan = new Channel(local, remote)
+        chan.setBasepoints(common.local_payment_basepoint, common.remote_payment_basepoint)
+        const locktime = chan.commitmentLocktime(42)
+        assert.strictEqual(locktime, 542251326)
     })
 })
