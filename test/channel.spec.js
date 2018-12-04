@@ -47,12 +47,49 @@ describe('Test commitment transactions', function () {
     })
 
     it('properly creates offered HTLC wscript', function () {
-        const pk = common.remotepubkey
         const script = Script.offeredHTLCout(common.local_revocation_pubkey, 
             common.localpubkey, 
             common.remotepubkey,
             crypto.createHash('sha256').update(Buffer.from(common.htlc_2_payment_preimage, 'hex')).digest())
         assert.strictEqual(script.toString('hex'), "76a91414011f7254d96b819c76986c277d115efce6f7b58763ac67210394854aa6eab5b2a8122cc726e9dded053a2184d88256816826d6231c068d4a5b7c820120876475527c21030d417a46946384f88d5f3337267c5e579765875dc4daca813e21734b140639e752ae67a914b43e1b38138a41b37f7cd9a1d274bc63e3a9b5d188ac6868")
+        assert.strictEqual(Script.scriptPubKey(script).toString('hex'), "0020403d394747cae42e98ff01734ad5c08f82ba123d3d9a620abda88989651e2ab5")
+
+        const script3 = Script.offeredHTLCout(common.local_revocation_pubkey, 
+            common.localpubkey, 
+            common.remotepubkey,
+            crypto.createHash('sha256').update(Buffer.from(common.htlc_3_payment_preimage, 'hex')).digest())
+        assert.strictEqual(script3.toString('hex'), "76a91414011f7254d96b819c76986c277d115efce6f7b58763ac67210394854aa6eab5b2a8122cc726e9dded053a2184d88256816826d6231c068d4a5b7c820120876475527c21030d417a46946384f88d5f3337267c5e579765875dc4daca813e21734b140639e752ae67a9148a486ff2e31d6158bf39e2608864d63fefd09d5b88ac6868")
+        assert.strictEqual(Script.scriptPubKey(script3).toString('hex'), "0020c20b5d1f8584fd90443e7b7b720136174fa4b9333c261d04dbbd012635c0f419")
+    })
+
+    it('properly creates received HTLC wscript', function () {
+        const script = Script.receivedHTLCout(common.local_revocation_pubkey, 
+            common.localpubkey, 
+            common.remotepubkey,
+            crypto.createHash('sha256').update(Buffer.from(common.htlc_0_payment_preimage, 'hex')).digest(),
+            common.htlc_0_expiry
+            )
+        assert.strictEqual(script.toString('hex'), "76a91414011f7254d96b819c76986c277d115efce6f7b58763ac67210394854aa6eab5b2a8122cc726e9dded053a2184d88256816826d6231c068d4a5b7c8201208763a914b8bcb07f6344b42ab04250c86a6e8b75d3fdbbc688527c21030d417a46946384f88d5f3337267c5e579765875dc4daca813e21734b140639e752ae677502f401b175ac6868")
+        assert.strictEqual(Script.scriptPubKey(script).toString('hex'), "002052bfef0479d7b293c27e0f1eb294bea154c63a3294ef092c19af51409bce0e2a")
+
+        const script1 = Script.receivedHTLCout(common.local_revocation_pubkey, 
+            common.localpubkey, 
+            common.remotepubkey,
+            crypto.createHash('sha256').update(Buffer.from(common.htlc_1_payment_preimage, 'hex')).digest(),
+            common.htlc_1_expiry
+            )
+        assert.strictEqual(script1.toString('hex'), "76a91414011f7254d96b819c76986c277d115efce6f7b58763ac67210394854aa6eab5b2a8122cc726e9dded053a2184d88256816826d6231c068d4a5b7c8201208763a9144b6b2e5444c2639cc0fb7bcea5afba3f3cdce23988527c21030d417a46946384f88d5f3337267c5e579765875dc4daca813e21734b140639e752ae677502f501b175ac6868")
+        assert.strictEqual(Script.scriptPubKey(script1).toString('hex'), "0020748eba944fedc8827f6b06bc44678f93c0f9e6078b35c6331ed31e75f8ce0c2d")
+
+        const script4 = Script.receivedHTLCout(common.local_revocation_pubkey, 
+            common.localpubkey, 
+            common.remotepubkey,
+            crypto.createHash('sha256').update(Buffer.from(common.htlc_4_payment_preimage, 'hex')).digest(),
+            common.htlc_4_expiry
+            )
+        assert.strictEqual(script4.toString('hex'), "76a91414011f7254d96b819c76986c277d115efce6f7b58763ac67210394854aa6eab5b2a8122cc726e9dded053a2184d88256816826d6231c068d4a5b7c8201208763a91418bc1a114ccf9c052d3d23e28d3b0a9d1227434288527c21030d417a46946384f88d5f3337267c5e579765875dc4daca813e21734b140639e752ae677502f801b175ac6868")
+        assert.strictEqual(Script.scriptPubKey(script4).toString('hex'), "00208c48d15160397c9731df9bc3b236656efb6665fbfe92b4a6878e88a499f741c4")
+
     })
 
     it('properly creates sequence', function () {

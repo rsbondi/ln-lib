@@ -77,7 +77,40 @@ class Script {
 
     }
 
-    static _key(k) { return typeof k == 'string' ? Buffer.from(k,'hex').toJSON().data : k } 
+    static receivedHTLCout(revocationpubkey, local_htlcpubkey, remote_htlcpubkey, payment_hash, expiry) {
+        const revpk = Script._keybuf(revocationpubkey)
+        const local = Script._key(local_htlcpubkey)
+        const remote = Script._key(remote_htlcpubkey)
+        const phash = Script._keybuf(payment_hash)
+        const exp = Script._key(expiry.toString(16)).reverse()
+        if(exp.length == 1) exp.push(0) // ?
+
+        const scripthash = crypto.createHash('sha256').update(revpk).digest()
+        const rmd160revoke = new ripemd160().update(scripthash).digest().toJSON().data
+        const rmd160payhash = new ripemd160().update(phash).digest().toJSON().data
+
+        const script = [opcodes.OP_DUP, opcodes.OP_HASH160]
+            .concat([rmd160revoke.length], rmd160revoke).concat([opcodes.OP_EQUAL]) 
+            .concat([opcodes.OP_IF])
+            .concat([opcodes.OP_CHECKSIG])
+            .concat([opcodes.OP_ELSE])
+            .concat([remote.length], remote).concat([opcodes.OP_SWAP, opcodes.OP_SIZE, 1, 32, opcodes.OP_EQUAL])
+            .concat([opcodes.OP_IF])
+            .concat([opcodes.OP_HASH160, rmd160payhash.length], rmd160payhash, [opcodes.OP_EQUALVERIFY])
+            .concat([opcodes.OP_2, opcodes.OP_SWAP])
+            .concat([local.length], local, [opcodes.OP_2, opcodes.OP_CHECKMULTISIG])            
+            .concat([opcodes.OP_ELSE, opcodes.OP_DROP, exp.length], exp, [opcodes.OP_CHECKLOCKTIMEVERIFY, opcodes.OP_DROP])
+            .concat([opcodes.OP_CHECKSIG])
+            .concat([opcodes.OP_ENDIF])
+            .concat([opcodes.OP_ENDIF])
+        return Buffer.from(script)
+
+    }
+
+    static _key(k) { 
+        if(k.length % 2) k = '0'+k
+        return typeof k == 'string' ? Buffer.from(k,'hex').toJSON().data : k 
+    } 
     static _keybuf(k) { return typeof k == 'string' ? Buffer.from(k,'hex') : k }
 }
 
