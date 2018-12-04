@@ -25,7 +25,7 @@ class Script {
     }
 
     static p2wpkh(pk) {
-        const pubkey = typeof pk == 'string' ? Buffer.from(pk,'hex') : pk
+        const pubkey = Script._keybuf(pk)
         const scripthash = crypto.createHash('sha256').update(pubkey).digest()
         const rmd160 = new ripemd160().update(scripthash).digest()
         return Buffer.from([opcodes.OP_0].concat([rmd160.length]).concat(rmd160.toJSON().data))
@@ -34,8 +34,7 @@ class Script {
     static toLocalOutput(revocationPubkey, localDelayedPubkey, toSelfDelay) {
         const rev = Script._key(revocationPubkey)
         const loc = Script._key(localDelayedPubkey)
-        const del = Script._key(toSelfDelay.toString(16)).reverse() // little endian
-        if(del.length == 1) del.push(0) // pad TODO: how to verify this is correct that it is always 2 digit???
+        const del = Script._int(toSelfDelay)
 
         const script = [opcodes.OP_IF]
             .concat([rev.length], rev)
@@ -82,9 +81,7 @@ class Script {
         const local = Script._key(local_htlcpubkey)
         const remote = Script._key(remote_htlcpubkey)
         const phash = Script._keybuf(payment_hash)
-        const exp = Script._key(expiry.toString(16)).reverse()
-        if(exp.length == 1) exp.push(0) // ?
-
+        const exp = Script._int(expiry)
         const scripthash = crypto.createHash('sha256').update(revpk).digest()
         const rmd160revoke = new ripemd160().update(scripthash).digest().toJSON().data
         const rmd160payhash = new ripemd160().update(phash).digest().toJSON().data
@@ -108,10 +105,26 @@ class Script {
     }
 
     static _key(k) { 
-        if(k.length % 2) k = '0'+k
-        return typeof k == 'string' ? Buffer.from(k,'hex').toJSON().data : k 
+        if(typeof k == 'string') {
+            if(k.length % 2) k = '0'+k
+            return Buffer.from(k,'hex').toJSON().data
+        }
+        if(Buffer.isBuffer(k)) return k.toJSON().data
+        throw ({message: 'value must be of type string of Buffer, recieved '+ typeof k})
     } 
-    static _keybuf(k) { return typeof k == 'string' ? Buffer.from(k,'hex') : k }
+    static _keybuf(k) { 
+        if(typeof k == 'string') {
+            return Buffer.from(k,'hex')
+        }
+        if(Buffer.isBuffer(k)) return k
+        throw ({message: 'value must be of type string of Buffer, recieved '+ typeof k})
+    }
+    static _int(i) {
+        if(typeof i != 'number') throw({message: `expected number, received ${typeof i}`})
+        const buf = Script._key(i.toString(16)).reverse() // little endian
+        if(buf.length == 1) buf.push(0) // pad TODO: how to verify this is correct that it is always 2 digit???
+        return buf
+    }
 }
 
 module.exports = Script

@@ -109,4 +109,41 @@ describe('Test commitment transactions', function () {
         const locktime = chan.commitmentLocktime(42)
         assert.strictEqual(locktime, 542251326)
     })
+
+    
+})
+
+describe('Test errors', function () {
+    it('script parameters do not accept invalid type expecting array result', function () {
+        assert.throws(
+            () => {
+                Script.createFundingScript([1, 2, 3], '')
+            },
+            {
+                message:  'value must be of type string of Buffer, recieved object'
+            }
+        )
+    })
+
+    it('script parameters do not accept invalid type expecting Buffer result', function () {
+        assert.throws(
+            () => {
+                Script.p2wpkh([1, 2, 3])
+            },
+            {
+                message:  'value must be of type string of Buffer, recieved object'
+            }
+        )
+    })
+
+    it('script parameters do not accept invalid number type', function () {
+        assert.throws(
+            () => {
+                Script.toLocalOutput('', '', '')
+            },
+            {
+                message:  'expected number, received string'
+            }
+        )
+    })
 })
