@@ -1,5 +1,6 @@
 const Channel = require('../src/channel')
 const Script = require('../src/script')
+const Fee = require('../src/fee')
 const testdata = require('./testdata')
 const assert = require('assert');
 const crypto = require('crypto')
@@ -147,3 +148,21 @@ describe('Test errors', function () {
         )
     })
 })
+
+describe('Test fees', function () {
+    it('calculate fee', function () {
+        let feeCalc = new Fee(5000, 546)
+        const fee =feeCalc.calculate({
+            offered: [
+                {value_msat: 5000000},
+                {value_msat: 1000000},
+            ],
+            received: [
+                {value_msat: 7000000},
+                {value_msat: 800000},
+            ]
+        })
+        assert.strictEqual(fee, 7140)
+    })
+})
+
