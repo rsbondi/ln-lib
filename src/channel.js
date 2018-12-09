@@ -1,11 +1,15 @@
 // ref: https://github.com/lightningnetwork/lightning-rfc/blob/master/03-transactions.md
-const Script = require('../src/script')
+const Script = require('./script')
 const crypto = require('crypto')
+const Fee = require('./fee')
+
 
 class Channel {
-    constructor(local_funding_pubkey, remote_funding_pubkey) {
+    constructor(local_funding_pubkey, remote_funding_pubkey, feerate_per_kw, dust_limit_satoshis) {
         this.local_funding_pubkey = local_funding_pubkey,
         this.remote_funding_pubkey = remote_funding_pubkey
+        this.fees = new Fee(feerate_per_kw, dust_limit_satoshis)
+        this.commitment_number = -1
     }
 
     fund(inputs, satoshis, change_out) {
@@ -31,15 +35,16 @@ class Channel {
         this.obscurator = this.commitmentObscurator(basepoint_open, basepoint_accept)
     }
 
-    commitmentSequence(num) {
-        const obsucreCommitNum = parseInt(this.obscurator.slice(0, 3).toString('hex'), 16) ^ num
+    commitmentSequence() {
+        // I am still not sure about this one, the rfc example does not seem to match, who can help???
+        const obsucreCommitNum = parseInt(this.obscurator.slice(0, 3).toString('hex'), 16) ^ this.commitment_number
         const commitBuff = Buffer.from(obsucreCommitNum.toString(16), 'hex')
         const sequenceBuff = Buffer.concat([Buffer.from([0x80]), commitBuff])
         return parseInt(sequenceBuff.toString('hex'), 16)
     }
 
-    commitmentLocktime(num) {
-        const obsucreCommitNum = parseInt(this.obscurator.slice(-3).toString('hex'), 16) ^ num
+    commitmentLocktime() {
+        const obsucreCommitNum = parseInt(this.obscurator.slice(-3).toString('hex'), 16) ^ this.commitment_number
         const commitBuff = Buffer.from(obsucreCommitNum.toString(16), 'hex')
         const lockBuff = Buffer.concat([Buffer.from([0x20]), commitBuff])
         return parseInt(lockBuff.toString('hex'), 16)
@@ -54,9 +59,28 @@ class Channel {
         return last48bits
     }
 
+    createCommitmentTx(tx) {
+        let commitmentTx = { version: 2, inputs: [], outputs: []}
+        this.commitment_number++
+
+        commitmentTx.locktime = this.commitmentLocktime()
+        tx.inputs[0].sequence = this.commitmentSequence() // ???
+        commitmentTx.inputs.push(tx.inputs[0])
+
+        commitmentTx.fee = this.fees.calculateAndTrim(tx.htlcs, tx.to_local, tx.to_remote)
+
+        tx.htlcs.offered.forEach(o => { if(!o.trimmed) commitmentTx.outputs.push(o) })        
+        tx.htlcs.received.forEach(o => { if(!o.trimmed) commitmentTx.outputs.push(o) })        
+
+        if(!tx.to_local.trimmed) commitmentTx.outputs.push(tx.to_local)
+        if(!tx.to_remote.trimmed) commitmentTx.outputs.push(tx.to_remote)
+
+        commitmentTx.outputs.sort((a, b) => {
+            return a.value < b.value ? 1 : b.value < a.value ? -1 : Buffer.compare(a.scriptPubKey, b.scriptPubKey)
+        })
+        return commitmentTx
+    }
+
 }
 
 module.exports = Channel
-
-//        return Buffer.from([opcodes.OP_0].concat([scripthash.length]).concat(Script._key(scripthash)))
-

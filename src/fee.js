@@ -4,18 +4,24 @@ class Fee {
         this.dust_limit_satoshis = dust_limit_satoshis
     }
 
-    calculate(htlcs, to_local, to_remote) {
+    calculateAndTrim(htlcs, to_local, to_remote) {
         let feeweight = Fee.WEIGHT_COMMITMENT_BASE
         let dust = 0
         htlcs.offered.forEach(out => {
             const timeoutWeight = this.calculateType(Fee.TYPE_TIMEOUT)
             if(out.value_msat / 1000 >= this.dust_limit_satoshis + timeoutWeight) feeweight += Fee.WEIGHT_COMMITMENT_UNTRIMMED
-            else dust += out.value_msat / 1000
+            else {
+                dust += out.value_msat / 1000
+                out.trimmed = true
+            }
         })
         htlcs.received.forEach(out => {
             const successWeight = this.calculateType(Fee.TYPE_SUCCESS)
             if(out.value_msat / 1000 >= this.dust_limit_satoshis + successWeight) feeweight += Fee.WEIGHT_COMMITMENT_UNTRIMMED
-            else dust += out.value_msat / 1000
+            else {
+                dust += out.value_msat / 1000
+                out.trimmed = true
+            }
         })
         return Math.floor((feeweight * this.feerate_per_kw) / 1000)  + dust
     }

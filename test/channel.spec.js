@@ -98,7 +98,8 @@ describe('Test commitment transactions', function () {
         const remote = testdata.funding.remote_funding_pubkey
         const chan = new Channel(local, remote)
         chan.setBasepoints(common.local_payment_basepoint, common.remote_payment_basepoint)
-        const sequence = chan.commitmentSequence(0) // TODO: this works but does not match the docs, need to find out what's up
+        chan.commitment_number = 0 // TODO: this works but does not match the docs, need to find out what's up
+        const sequence = chan.commitmentSequence()
         assert.strictEqual(sequence, 2150346808)
     })
 
@@ -107,7 +108,8 @@ describe('Test commitment transactions', function () {
         const remote = testdata.funding.remote_funding_pubkey
         const chan = new Channel(local, remote)
         chan.setBasepoints(common.local_payment_basepoint, common.remote_payment_basepoint)
-        const locktime = chan.commitmentLocktime(42)
+        chan.commitment_number = 42
+        const locktime = chan.commitmentLocktime()
         assert.strictEqual(locktime, 542251326)
     })
 
@@ -152,7 +154,7 @@ describe('Test errors', function () {
 describe('Test fees', function () {
     it('calculate fee', function () {
         let feeCalc = new Fee(5000, 546)
-        const fee =feeCalc.calculate({
+        const fee =feeCalc.calculateAndTrim({
             offered: [
                 {value_msat: 5000000},
                 {value_msat: 1000000},
@@ -163,6 +165,25 @@ describe('Test fees', function () {
             ]
         })
         assert.strictEqual(fee, 7140)
+    })
+
+    it('check proper trimming of outputs', function () {
+        let feeCalc = new Fee(5000, 546)
+        let htlcs = {
+            offered: [
+                {value_msat: 5000000},
+                {value_msat: 1000000},
+            ],
+            received: [
+                {value_msat: 7000000},
+                {value_msat: 800000},
+            ]
+        }
+        const fee =feeCalc.calculateAndTrim(htlcs)
+        assert.strictEqual(htlcs.offered[0].trimmed, undefined)
+        assert.strictEqual(htlcs.offered[1].trimmed, true)
+        assert.strictEqual(htlcs.received[0].trimmed, undefined)
+        assert.strictEqual(htlcs.received[1].trimmed, true)
     })
 })
 
