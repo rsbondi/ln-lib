@@ -36,18 +36,24 @@ class Channel {
     }
 
     commitmentSequence() {
-        // I am still not sure about this one, the rfc example does not seem to match, who can help???
-        const obsucreCommitNum = parseInt(this.obscurator.slice(0, 3).toString('hex'), 16) ^ this.commitment_number
+        let mask = 0
+        // 48 bits falls within Number.MAX_SAFE_INTEGER but bitwise is limited to 32 bits, so hack here
+        if(this.commitment_number >= Math.pow(2,32)) {
+            const buf = Buffer.from(this.commitment_number.toString(16), 'hex')
+            const maskbuf = buf.slice(0, -3)
+            mask = maskbuf.readUIntBE(0, maskbuf.length)
+        }
+        const obsucreCommitNum = this.obscurator.slice(0, 3).readUIntBE(0, 3) ^ mask
         const commitBuff = Buffer.from(obsucreCommitNum.toString(16), 'hex')
         const sequenceBuff = Buffer.concat([Buffer.from([0x80]), commitBuff])
-        return parseInt(sequenceBuff.toString('hex'), 16)
+        return sequenceBuff.readUIntBE(0, 4)
     }
 
     commitmentLocktime() {
-        const obsucreCommitNum = parseInt(this.obscurator.slice(-3).toString('hex'), 16) ^ this.commitment_number
+        const obsucreCommitNum = this.obscurator.slice(-3).readUIntBE(0, 3) ^ this.commitment_number
         const commitBuff = Buffer.from(obsucreCommitNum.toString(16), 'hex')
         const lockBuff = Buffer.concat([Buffer.from([0x20]), commitBuff])
-        return parseInt(lockBuff.toString('hex'), 16)
+        return lockBuff.readUIntBE(0, 4)
     }
 
     commitmentObscurator(basepoint_open, basepoint_accept) {

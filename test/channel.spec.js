@@ -98,7 +98,7 @@ describe('Test commitment transactions', function () {
         const remote = testdata.funding.remote_funding_pubkey
         const chan = new Channel(local, remote)
         chan.setBasepoints(common.local_payment_basepoint, common.remote_payment_basepoint)
-        chan.commitment_number = 0 // TODO: this works but does not match the docs, need to find out what's up
+        chan.commitment_number = 42
         const sequence = chan.commitmentSequence()
         assert.strictEqual(sequence, 2150346808)
     })
