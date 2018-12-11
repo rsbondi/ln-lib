@@ -1,6 +1,9 @@
 const WordReader = require('./reader')
 
-function processHex(data, enc) {return Buffer.from(convertWords(data, 5, 8)).toString(enc)}
+function processHex(data, enc) {
+  const buf = Buffer.from(convertWords(data, 5, 8))
+  return enc ? buf.toString(enc) : buf
+}
 
 function processInt(data) {
   let val = 0
