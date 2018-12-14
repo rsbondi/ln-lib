@@ -35,6 +35,7 @@ const opcodes = {
   OP_CHECKMULTISIG: 0xae,
   OP_CHECKLOCKTIMEVERIFY: 0xb1,
   OP_CHECKSEQUENCEVERIFY: 0xb2,
+  push(bytes) { return [bytes.length].concat(Buffer.isBuffer(bytes) ? bytes.toJSON().data : bytes) }
 };
 
 // this allows you to get code name from hex value
@@ -45,5 +46,5 @@ const codeops = Object.keys(opcodes).reduce((o, k) => {
 module.exports = {
     prefixes: prefixes,
     amounts: amounts,
-    opcodes: opcodes
+    ops: opcodes
 }
