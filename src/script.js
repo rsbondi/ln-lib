@@ -2,6 +2,18 @@ const {ops} = require('./constants')
 const crypto = require('crypto')
 const ripemd160 = require('ripemd160')
 
+class ScriptBuilder {
+    constructor() { this.bytes = [] }
+    op(...codes) { 
+        console.log(codes)
+        codes.forEach(code => {
+            this.bytes = this.bytes.concat(Array.isArray(code) ? code : [code])
+        })
+        return this 
+    }
+    buffer() { return Buffer.from(this.bytes) }
+}
+
 class Script {
     // 2 of 2 multisig script for creating commitments
     // hashed in scriptPubKey for funding
@@ -9,12 +21,13 @@ class Script {
         const local = Script._key(local_pubkey)
         const remote = Script._key(remote_pubkey)
 
-        const script = [ops.OP_2]
-            .concat(ops.push(local))
-            .concat(ops.push(remote))
-            .concat([ops.OP_2])
-            .concat([ops.OP_CHECKMULTISIG])
-        return Buffer.from(script)
+        const script = new ScriptBuilder()
+        script.op(ops.OP_2)
+              .op(ops.push(local))
+              .op(ops.push(remote))
+              .op(ops.OP_2)
+              .op(ops.OP_CHECKMULTISIG)
+        return script.buffer()
     }
 
     static scriptPubKey(script) {
@@ -34,16 +47,17 @@ class Script {
         const loc = Script._key(localDelayedPubkey)
         const del = Script._int(toSelfDelay)
 
-        const script = [ops.OP_IF]
-            .concat(ops.push(rev))
-            .concat(ops.OP_ELSE)
-            .concat(ops.push(del))
-            .concat(ops.OP_CHECKSEQUENCEVERIFY)
-            .concat(ops.OP_DROP)
-            .concat(ops.push(loc))
-            .concat(ops.OP_ENDIF)
-            .concat(ops.OP_CHECKSIG)
-        return Buffer.from(script)
+        return new ScriptBuilder()
+            .op(ops.OP_IF)
+            .op(ops.push(rev))
+            .op(ops.OP_ELSE)
+            .op(ops.push(del))
+            .op(ops.OP_CHECKSEQUENCEVERIFY)
+            .op(ops.OP_DROP)
+            .op(ops.push(loc))
+            .op(ops.OP_ENDIF)
+            .op(ops.OP_CHECKSIG)
+            .buffer()
     }
 
     static offeredHTLCout(revocationpubkey, local_htlcpubkey, remote_htlcpubkey, payment_hash) {
@@ -56,22 +70,22 @@ class Script {
         const rmd160revoke = new ripemd160().update(scripthash).digest().toJSON().data
         const rmd160payhash = new ripemd160().update(phash).digest().toJSON().data
 
-        const script = [ops.OP_DUP, ops.OP_HASH160]
-            .concat(ops.push(rmd160revoke).concat([ops.OP_EQUAL]))
-            .concat([ops.OP_IF])
-            .concat([ops.OP_CHECKSIG])
-            .concat([ops.OP_ELSE])
-            .concat(ops.push(remote).concat([ops.OP_SWAP, ops.OP_SIZE, 1, 32, ops.OP_EQUAL]))
-            .concat([ops.OP_NOTIF])
-            .concat([ops.OP_DROP, ops.OP_2, ops.OP_SWAP])
-            .concat(ops.push(local), [ops.OP_2, ops.OP_CHECKMULTISIG])
-            .concat([ops.OP_ELSE])
-            .concat([ops.OP_HASH160], ops.push(rmd160payhash), [ops.OP_EQUALVERIFY])
-            .concat([ops.OP_CHECKSIG])
-            .concat([ops.OP_ENDIF])
-            .concat([ops.OP_ENDIF])
-        return Buffer.from(script)
-
+        return new ScriptBuilder()
+            .op(ops.OP_DUP, ops.OP_HASH160)
+            .op(ops.push(rmd160revoke), ops.OP_EQUAL)
+            .op(ops.OP_IF)
+            .op(ops.OP_CHECKSIG)
+            .op(ops.OP_ELSE)
+            .op(ops.push(remote), ops.OP_SWAP, ops.OP_SIZE, 1, 32, ops.OP_EQUAL)
+            .op(ops.OP_NOTIF)
+            .op(ops.OP_DROP, ops.OP_2, ops.OP_SWAP)
+            .op(ops.push(local), ops.OP_2, ops.OP_CHECKMULTISIG)
+            .op(ops.OP_ELSE)
+            .op(ops.OP_HASH160, ops.push(rmd160payhash), ops.OP_EQUALVERIFY)
+            .op(ops.OP_CHECKSIG)
+            .op(ops.OP_ENDIF)
+            .op(ops.OP_ENDIF)
+            .buffer()
     }
 
     static receivedHTLCout(revocationpubkey, local_htlcpubkey, remote_htlcpubkey, payment_hash, expiry) {
@@ -84,22 +98,22 @@ class Script {
         const rmd160revoke = new ripemd160().update(scripthash).digest().toJSON().data
         const rmd160payhash = new ripemd160().update(phash).digest().toJSON().data
 
-        const script = [ops.OP_DUP, ops.OP_HASH160]
-            .concat(ops.push(rmd160revoke)).concat([ops.OP_EQUAL]) 
-            .concat([ops.OP_IF])
-            .concat([ops.OP_CHECKSIG])
-            .concat([ops.OP_ELSE])
-            .concat(ops.push(remote), [ops.OP_SWAP, ops.OP_SIZE, 1, 32, ops.OP_EQUAL])
-            .concat([ops.OP_IF])
-            .concat([ops.OP_HASH160], ops.push(rmd160payhash), [ops.OP_EQUALVERIFY])
-            .concat([ops.OP_2, ops.OP_SWAP])
-            .concat(ops.push(local), [ops.OP_2, ops.OP_CHECKMULTISIG])            
-            .concat([ops.OP_ELSE, ops.OP_DROP], ops.push(exp), [ops.OP_CHECKLOCKTIMEVERIFY, ops.OP_DROP])
-            .concat([ops.OP_CHECKSIG])
-            .concat([ops.OP_ENDIF])
-            .concat([ops.OP_ENDIF])
-        return Buffer.from(script)
-
+        return new ScriptBuilder()
+            .op(ops.OP_DUP, ops.OP_HASH160)
+            .op(ops.push(rmd160revoke), ops.OP_EQUAL) 
+            .op(ops.OP_IF)
+            .op(ops.OP_CHECKSIG)
+            .op(ops.OP_ELSE)
+            .op(ops.push(remote), ops.OP_SWAP, ops.OP_SIZE, 1, 32, ops.OP_EQUAL)
+            .op(ops.OP_IF)
+            .op(ops.OP_HASH160, ops.push(rmd160payhash), ops.OP_EQUALVERIFY)
+            .op(ops.OP_2, ops.OP_SWAP)
+            .op(ops.push(local), ops.OP_2, ops.OP_CHECKMULTISIG)
+            .op(ops.OP_ELSE, ops.OP_DROP, ops.push(exp), ops.OP_CHECKLOCKTIMEVERIFY, ops.OP_DROP)
+            .op(ops.OP_CHECKSIG)
+            .op(ops.OP_ENDIF)
+            .op(ops.OP_ENDIF)
+            .buffer()
     }
 
     static _key(k) { 
