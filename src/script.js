@@ -5,10 +5,7 @@ const ripemd160 = require('ripemd160')
 class ScriptBuilder {
     constructor() { this.bytes = [] }
     op(...codes) { 
-        console.log(codes)
-        codes.forEach(code => {
-            this.bytes = this.bytes.concat(Array.isArray(code) ? code : [code])
-        })
+        codes.forEach(code => this.bytes = this.bytes.concat(Array.isArray(code) ? code : [code]))
         return this 
     }
     buffer() { return Buffer.from(this.bytes) }
@@ -21,13 +18,13 @@ class Script {
         const local = Script._key(local_pubkey)
         const remote = Script._key(remote_pubkey)
 
-        const script = new ScriptBuilder()
-        script.op(ops.OP_2)
-              .op(ops.push(local))
-              .op(ops.push(remote))
-              .op(ops.OP_2)
-              .op(ops.OP_CHECKMULTISIG)
-        return script.buffer()
+        return new ScriptBuilder()
+            .op(ops.OP_2)
+            .op(ops.push(local))
+            .op(ops.push(remote))
+            .op(ops.OP_2)
+            .op(ops.OP_CHECKMULTISIG)
+            .buffer()
     }
 
     static scriptPubKey(script) {
