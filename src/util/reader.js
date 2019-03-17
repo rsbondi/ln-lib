@@ -1,3 +1,5 @@
+// this is for bech32 5 bit word format
+
 class WordReader {
     constructor(words) {
       this.index = 0

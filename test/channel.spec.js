@@ -1,7 +1,7 @@
 const Channel = require('../src/channel')
 const Script = require('../src/script')
 const Fee = require('../src/fee')
-const testdata = require('./testdata')
+const testdata = require('./data/testdata_channels')
 const assert = require('assert');
 const crypto = require('crypto')
 

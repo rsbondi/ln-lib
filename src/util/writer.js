@@ -1,3 +1,5 @@
+// this is for bech32 5 bit word format
+
 const bech32 = require('bech32')
 
 class WordWriter {

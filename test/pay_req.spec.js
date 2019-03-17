@@ -1,5 +1,5 @@
 const PaymentRequest = require('../src/invoice')
-const testdata = require('./testdata')
+const testdata = require('./data/testdata_requests')
 const assert = require('assert');
 
 describe('Test payment lib decoding', function () {
