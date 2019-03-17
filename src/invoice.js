@@ -1,11 +1,13 @@
+// BOLT11
+
 const secp256k1 = require('secp256k1')
 const bech32 = require('bech32')
 const crypto = require('crypto')
 const big = require('bignumber.js')
-const {prefixes, amounts} = require('./constants')
-const {decodeTypes, encodeTypes} = require('./util')
-const WordReader = require('./reader')
-const WordWriter = require('./writer')
+const {prefixes, amounts} = require('./util/constants')
+const {decodeTypes, encodeTypes} = require('./util/util')
+const WordReader = require('./util/reader')
+const WordWriter = require('./util/writer')
 
 class PaymentRequest {
   /**

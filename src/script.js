@@ -1,4 +1,6 @@
-const {ops} = require('./constants')
+// BOLT3
+
+const {ops} = require('./util/constants')
 const crypto = require('crypto')
 const ripemd160 = require('ripemd160')
 

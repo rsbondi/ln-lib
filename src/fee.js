@@ -1,3 +1,5 @@
+// BOLT3
+
 class Fee {
     constructor(feerate_per_kw, dust_limit_satoshis) {
         this.feerate_per_kw = feerate_per_kw

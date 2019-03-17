@@ -1,3 +1,5 @@
+// BOLT3
+
 // ref: https://github.com/lightningnetwork/lightning-rfc/blob/master/03-transactions.md
 const Script = require('./script')
 const crypto = require('crypto')
