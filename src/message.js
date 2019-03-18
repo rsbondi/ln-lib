@@ -78,7 +78,7 @@ class Message {
            return {chain_hash, temporary_channel_id, funding_satoshis, push_msat, dust_limit_satoshis, max_htlc_value_in_flight_msat,
                     channel_reserve_satoshis, htlc_minimum_msat, feerate_per_kw, to_self_delay, max_accepted_htlcs, funding_pubkey,
                     revocation_basepoint, payment_basepoint, delayed_payment_basepoint, htlc_basepoint, first_per_commitment_point, 
-                    channel_flags, option_upfront_shutdown_script}
+                    channel_flags, option_upfront_shutdown_script, name: 'open_channel'}
         },
 
         // accept_channel
@@ -102,7 +102,7 @@ class Message {
                 const option_upfront_shutdown_script = this._read(shutdown_len)
             }
 
-            return {temporary_channel_id, dust_limit_satoshis, max_htlc_value_in_flight_msat, channel_reserve_satoshis, htlc_minimum_msat,
+            return {name:'accept_channel', temporary_channel_id, dust_limit_satoshis, max_htlc_value_in_flight_msat, channel_reserve_satoshis, htlc_minimum_msat,
                     minimum_depth, to_self_delay, max_accepted_htlcs, funding_pubkey, revocation_basepoint, payment_basepoint, 
                     delayed_payment_basepoint, htlc_basepoint, first_per_commitment_point, option_upfront_shutdown_script}
 
@@ -115,7 +115,7 @@ class Message {
             const funding_output_index = this._readInt(2)
             const signature = this._read(64)
 
-            return {temporary_channel_id, funding_txid, funding_output_index, signature}
+            return {name: 'funding_created', temporary_channel_id, funding_txid, funding_output_index, signature}
         },
 
         // funding_signed
@@ -123,7 +123,7 @@ class Message {
             const channel_id = this._read(32)
             const signature = this._read(64)
 
-            return {channel_id, signature}
+            return {name: 'funding_signed', channel_id, signature}
         },
 
         // funding_locked
@@ -131,7 +131,7 @@ class Message {
             const channel_id = this._read(32)
             const next_per_commitment_point = this._read(33)
 
-            return {channel_id, next_per_commitment_point}
+            return {name: 'funding_locked', channel_id, next_per_commitment_point}
         },
 
         // shutdown
@@ -140,7 +140,7 @@ class Message {
             const len = this._readInt(2)
             const scriptpubkey = this._read(len)
 
-            return {channel_id, scriptpubkey}
+            return {name: 'shutdown', channel_id, scriptpubkey}
         },
 
         // closing_signed
@@ -149,7 +149,7 @@ class Message {
             const fee_satoshis = this._readInt(8)
             const signature = this._read(64)
 
-            return {channel_id, fee_satoshis, signature}
+            return {name: 'closing_signed', channel_id, fee_satoshis, signature}
         },
 
         // update_add_htlc
@@ -161,7 +161,7 @@ class Message {
             const cltv_expiry = this._readInt(4)
             const onion_routing_packet = this._read(1366)
             
-            return {channel_id, id, amount_msat, payment_hash, cltv_expiry, onion_routing_packet}
+            return {name: 'update_add_htlc', channel_id, id, amount_msat, payment_hash, cltv_expiry, onion_routing_packet}
         },
 
         // update_fulfill_htlc
@@ -170,7 +170,7 @@ class Message {
             const id = this._read(8)
             const payment_preimage = this._read(32)
 
-            return {channel_id, id, payment_preimage}
+            return {name: 'update_fulfill_htlc', channel_id, id, payment_preimage}
         },
 
         // update_fail_htlc
@@ -180,7 +180,7 @@ class Message {
             const len = this._readInt(2)
             const reason = this._read(len) // TODO: string???
 
-            return {channel_id, id, reason}
+            return {name: 'update_fail_htlc', channel_id, id, reason}
         },
 
         // update_fail_malformed_htlc
@@ -190,7 +190,7 @@ class Message {
             const sha256_of_onion = this._read(32)
             const failure_code = this._read(2)
 
-            return {channel_id, id, sha256_of_onion, failure_code}
+            return {name: 'update_fail_malformed_htlc', channel_id, id, sha256_of_onion, failure_code}
         },
 
         // commitment_signed
@@ -201,7 +201,7 @@ class Message {
             let htlc_signatures = []
             for(let i=0; i < num_htlcs; i++) htlc_signatures.push(this._read(64))
             
-            return {channel_id, signature, htlc_signatures}
+            return {name: 'commitment_signed', channel_id, signature, htlc_signatures}
         },
 
         // revoke_and_ack
@@ -210,7 +210,7 @@ class Message {
             const per_commitment_secret = this._read(32)
             const next_per_commitment_point = this._read(33)
 
-            return {channel_id, per_commitment_secret, next_per_commitment_point}
+            return {name: 'revoke_and_ack', channel_id, per_commitment_secret, next_per_commitment_point}
         },
 
         // update_fee
@@ -218,7 +218,7 @@ class Message {
             const channel_id = this._read(32)
             const feerate_per_kw = this._readInt(4)
 
-            return {channel_id, feerate_per_kw}
+            return {name:'update_fee', channel_id, feerate_per_kw}
         },
 
         // channel_reestablish
@@ -231,29 +231,84 @@ class Message {
             // [32:your_last_per_commitment_secret] (option_data_loss_protect)
             // [33:my_current_per_commitment_point] (option_data_loss_protect)
 
-            return {channel_id, next_local_commitment_number, next_remote_revocation_number}
+            return {name: 'channel_reestablish', channel_id, next_local_commitment_number, next_remote_revocation_number}
         },
 
         /* BOLT 7 */
 
         // announcement_signatures
         259: () => {
+            const channel_id = this._read(32)
+            const short_channel_id = this._read(8)
+            const node_signature = this._read(64)
+            const bitcoin_signature = this._read(64)
 
+            return {name: 'announcement_signatures', channel_id, short_channel_id, node_signature, bitcoin_signature}
         },
 
         // channel_announcement
         256: () => {
+            const node_signature_1 = this._read(64)
+            const node_signature_2 = this._read(64)
+            const bitcoin_signature_1 = this._read(64)
+            const bitcoin_signature_2 = this._read(64)
+            const len = this._readInt(2)
+            const features = this._read(len)
+            const chain_hash = this._read(32)
+            const short_channel_id = this._read(8)
+            const node_id_1 = this._read(33)
+            const node_id_2 = this._read(33)
+            const bitcoin_key_1 = this._read(33)
+            const bitcoin_key_2 = this._read(33)
 
+            return {name: 'channel_announcement', node_signature_1, node_signature_2, bitcoin_signature_1, bitcoin_signature_2,
+                    features, chain_hash, short_channel_id, node_id_1, node_id_2, bitcoin_key_1, bitcoin_key_2}
         },
 
         // node_announcement
         257: () => {
+            const signature = this._read(64)
+            const flen = this._readInt(2)
+            const features =  this._read(flen)
+            const timestamp = this._readInt(4)
+            const node_id = this._read(33)
+            const rgb_color = this._read(3)
+            const alias = this._read(32) // TODO: string???
+            const addrlen = this._readInt(2)
+            const addresses = this._read(addrlen)
 
+            /* TODO: need to understand better
+addresses allows a node to announce its willingness to accept incoming network connections: it contains a series of address descriptors for connecting to the node. The first byte describes the address type and is followed by the appropriate number of bytes for that type.
+
+The following address descriptor types are defined:
+
+1: ipv4; data = [4:ipv4_addr][2:port] (length 6)
+2: ipv6; data = [16:ipv6_addr][2:port] (length 18)
+3: Tor v2 onion service; data = [10:onion_addr][2:port] (length 12)
+version 2 onion service addresses; Encodes an 80-bit, truncated SHA-1 hash of a 1024-bit RSA public key for the onion service (a.k.a. Tor hidden service).
+4: Tor v3 onion service; data = [35:onion_addr][2:port] (length 37)
+version 3 (prop224) onion service addresses; Encodes: [32:32_byte_ed25519_pubkey] || [2:checksum] || [1:version], where checksum = sha3(".onion checksum" | pubkey || version)[:2].
+            */
+
+            return {name: 'node_announcement', signature, features, timestamp, node_id, rgb_color, alias, addresses}
         },
 
         // channel_update
         258: () => {
+            const signature = this._read(64)
+            const chain_hash = this._read(32)
+            const short_channel_id = this._read(8)
+            const timestamp = this._readInt(4)
+            const message_flags = this._read(1)
+            const channel_flags = this._read(1)
+            const cltv_expiry_delta = this._readInt(2)
+            const htlc_minimum_msat = this._readInt(8)
+            const fee_base_msat = this._readInt(4)
+            const fee_proportional_millionths = this._readInt(4)
+            const htlc_maximum_msat = this.index < this.bytes.length ? this._readInt(8) : null
 
+            return {name: 'channel_update', signature, chain_hash, short_channel_id, timestamp, message_flags, channel_flags,
+                    cltv_expiry_delta, htlc_minimum_msat, fee_base_msat, fee_proportional_millionths, htlc_maximum_msat}
         }
 
     }
