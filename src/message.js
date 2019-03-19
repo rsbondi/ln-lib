@@ -8,7 +8,12 @@ class Message {
     constructor(hex) {
         this.bytes = hex
         this.index = 0 // byte
-        this.parsers = {
+        this.message = this._parse(hex)
+
+    }
+
+    parser(n) {
+        return {
             // init
             16: () => {
                 const gflen = this._readInt(2)
@@ -308,9 +313,7 @@ class Message {
                         cltv_expiry_delta, htlc_minimum_msat, fee_base_msat, fee_proportional_millionths, htlc_maximum_msat}
             }
         
-        }
-        this.message = this._parse(hex)
-
+        }[n]
     }
 
     _read(n) {
@@ -334,11 +337,12 @@ class Message {
     _parse() {
         const msgType = this._readInt(2)
         // index now points to payload
-
-        if(!(msgType in this.parsers)) {
+        
+        const parser = this.parser(msgType)
+        if(typeof parser == 'undefined') {
             return {error: 'invalid message type'}
         }
-        return this.parsers[msgType]()
+        return parser()
     }
 }
 

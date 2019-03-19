@@ -10,9 +10,11 @@ describe('Test Messages', function () {
     })
 
     it('init message', function () {
-        const msg = Buffer.from([0, 16, 0, 1, 1])
+        const msg = Buffer.from([0, 16, 0, 0, 0, 1, 1])
         const init = new Message(msg)
         assert.strictEqual(init.message.name, 'init')
+        assert.strictEqual(init.message.globalfeatures.length, 0)
+        assert.strictEqual(init.message.localfeatures[0], 1)
     })
 
 
