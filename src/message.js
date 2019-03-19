@@ -9,7 +9,6 @@ class Message {
         this.bytes = hex
         this.index = 0 // byte
         this.message = this._parse(hex)
-
     }
 
     parser(n) {
@@ -337,7 +336,7 @@ class Message {
     _parse() {
         const msgType = this._readInt(2)
         // index now points to payload
-        
+
         const parser = this.parser(msgType)
         if(typeof parser == 'undefined') {
             return {error: 'invalid message type'}
